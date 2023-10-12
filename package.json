@@ -8,6 +8,10 @@
   "dependencies": {
     "@alexanderolsen/libsamplerate-js": "^2.0.4",
     "dotenv": "^16.3.1",
+    "libopus": "^0.0.36",
+    "speex-resampler": "^3.0.1",
+    "speex-resampler-ava-version-branch": "AvaHQ/speex-resampler#remove-unhandled-rejection-handler",
+    "speex-resampler-ava-version-master": "AvaHQ/speex-resampler",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
     "wavefile": "^11.0.0"
