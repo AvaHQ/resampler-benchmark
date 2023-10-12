@@ -130,3 +130,4 @@ dist
 .pnp.*
 output/*
 !output/.gitkeep
+.env
