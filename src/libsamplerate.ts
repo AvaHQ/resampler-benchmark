@@ -2,8 +2,9 @@ import { create, ConverterType } from "@alexanderolsen/libsamplerate-js";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { WaveFile } from "wavefile";
+import "dotenv/config";
 
-const inFile = "/Users/dieudonn/Downloads/large-sample-usa.wav";
+const inFile = process.env.LARGE_WAV_PATH;
 const outFile = resolve(__dirname, "../output/output-libsamplerate.wav");
 
 const data = readFileSync(inFile, { encoding: "base64" });

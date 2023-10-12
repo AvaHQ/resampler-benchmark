@@ -131,3 +131,4 @@ dist
 output/*
 !output/.gitkeep
 .env
+.DS_Store
