@@ -11,14 +11,14 @@ This repository is just to have a possibility to remember the benchmark for resa
 2. Download the audio file **(~60mb)** and rename it `large-sample-usa.wav`
 3. Duplicate the `.env.example` file to `.env` and put the right path of the downloaded file
 
-### 🟧 Speex-resampler
+### 🟧 Speex-resampler (4s-13s)
 
 It's the library we are using ATM at ava, it's a webassembly using c native code.
 It have issue on master branch but is faster on the branch used on ava-backend called `remove-unhandled-rejection-handler` we need to fix that to not re-create the issue. master has one more commit `f9f3320cc8fc61a585489efa5552a5f8ec0c3517` and it pass from 20 seconds on master to 4 secondes of transform inside the branch
 
 To test it uncomment the version you want to test inside `src/speex-resampler`and run `npx ts-node src/speex-resampler.ts`
 
-### 🟧 libsamplerate.js
+### 🟧 libsamplerate.js (8s)
 
 This library could be tried via the file `src/output-libsamplerate.ts` via `npx ts-node src/libsamplerate.ts` it will output the wav file into `output/-libsamplerate`
 
@@ -37,9 +37,21 @@ Opus codec [seems to not deal only with a 48Khz rate](https://wiki.xiph.org/Opus
 
 - It cannot resample to 16Khz, it can just take any rate in entrey and normalize to 48Khz so it's a no go
 
-## ✅ Sox binary
+## ✅ Sox binary (0.2s)
 
 This one is really fast and result is good, [it's a C library](https://sourceforge.net/p/sox/code/ci/master/tree/) wrotte in 1991, [some portability in other langage exist](https://fr.wikipedia.org/wiki/SoX#Bibliothèque)
 
 1. Install the binary `brew install sox`
 2. Resample the file `time sox /Users/dieudonn/Downloads/large-sample-usa.wav -r 16000 ./output/output-sox.wav`
+
+## ✅ Rubato Rust library (0.2s-0.4s)
+
+[This library](https://github.com/HEnquist/rubato) can be used in a Rust program directly, there is [4/5](https://github.com/HEnquist/rubato/tree/master/examples) different options to tests that have better result of better speed.
+Two way of testing them:
+
+1. In this repository you can setup the .env file correctly
+2. Run `cargo run --release`
+3. The time took to convert if fast, but the time to write the file can be slow :S.
+
+Or you can test it in the github rubato folder
+with this [kind of command](https://github.com/HEnquist/rubato/blob/master/examples/process_f64.rs#L24C5-L24C98) `argo run --release --example process_f64 SincFixedIn sine_f64_2ch.raw test.raw 44100 192000 2`

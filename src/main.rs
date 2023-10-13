@@ -1,6 +1,11 @@
+extern crate dotenv;
+
 use rubato::{Resampler, SincFixedIn,  SincInterpolationType, SincInterpolationParameters, WindowFunction};
+use std::env;
 use std::fs::File;
 use std::io::{BufReader, Read, Seek, Write};
+use std::time::Instant;
+
 
 const BYTE_PER_SAMPLE: usize = 8;
 fn main() {
@@ -8,14 +13,15 @@ fn main() {
     let fs_out = 16000;
     let fs_in = 44100;
 
+    dotenv::dotenv().ok(); // load.env file
 
-
-    // let waves_in = vec![vec![0.0f64; 1024];2];
-    // let waves_out = resampler.process(&waves_in, None).unwrap();
 
     // Open the input
+    let default_path = "/Users/dieudonn/Downloads/large-sample-usa.raw";
+    let input_path = env::var("LARGE_WAV_PATH").unwrap_or(default_path.to_string());
+    let output_path = env::current_dir().unwrap().join("output/output-rubato-sync.raw") ;
 
-    let file_in_disk = File::open("/Users/dieudonn/Downloads/large-sample-usa.raw").expect("Can't open file");
+    let file_in_disk = File::open(input_path).expect("Can't open file");
     let mut file_in_reader = BufReader::new(file_in_disk);
     let indata = read_file(&mut file_in_reader, channels);
     let nbr_input_frames = indata[0].len();
@@ -30,7 +36,7 @@ fn main() {
 
     let f_ratio = fs_out as f64 / fs_in as f64;
 
-
+    let duration = Instant::now();
     // Instanciate the re-sampler 
     let params = SincInterpolationParameters {
         sinc_len: 256,
@@ -74,8 +80,8 @@ fn main() {
     }
 
     let nbr_output_frames = (nbr_input_frames as f32 * fs_out as f32 / fs_in as f32) as usize;
-    println!("Re-Sample is done.. write file to disk now");
-    let mut file_out_disk = File::create("/Users/dieudonn/Downloads/large-sample-usa-rubato-16khz.raw").unwrap();
+    println!("Re-Sample was done in {:?}.. write file to disk now", duration.elapsed());
+    let mut file_out_disk = File::create(output_path).unwrap();
     write_frames(
         outdata,
         &mut file_out_disk,
@@ -114,7 +120,7 @@ fn write_frames<W: Write + Seek>(
     frames_to_write: usize,
 ) {
     let channels = waves.len();
-    println!("We have {} number of element in the vec to writte now", frames_to_write);
+    println!("We have {}  elements in the vec to export now", frames_to_write);
     let end = frames_to_skip + frames_to_write;
     for frame in frames_to_skip..end {
         for wave in waves.iter().take(channels) {

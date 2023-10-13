@@ -7,10 +7,15 @@ use std::time::Instant;
 use tokio::fs::File as TokyioFile;
 use tokio::io::{AsyncWriteExt, Result};
 
+// This file is the equivalent of the main but write in async , it does not work properly , the output does not have the correct size
+
 const BYTE_PER_SAMPLE: usize = 8;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+
+    dotenv::dotenv().ok(); // load.env file
+    
     let channels = 2;
     let fs_out = 48000;
     let fs_in = 44100;
