@@ -17,10 +17,14 @@ It's the library we are using ATM at ava, it's a webassembly using c native code
 It have issue on master branch but is faster on the branch used on ava-backend called `remove-unhandled-rejection-handler` we need to fix that to not re-create the issue. master has one more commit `f9f3320cc8fc61a585489efa5552a5f8ec0c3517` and it pass from 20 seconds on master to 4 secondes of transform inside the branch
 
 To test it uncomment the version you want to test inside `src/speex-resampler`and run `npx ts-node src/speex-resampler.ts`
+![Capture d’écran 2023-10-12 à 11 30 50](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/d926a8ea-8938-4b03-b53e-3c83d0e193ae)
+
+
 
 ### 🟧 libsamplerate.js (8s)
 
 This library could be tried via the file `src/output-libsamplerate.ts` via `npx ts-node src/libsamplerate.ts` it will output the wav file into `output/-libsamplerate`
+![libsamplerate](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/5db8c7aa-e25e-4385-8104-4553b3de2f5c)
 
 ## ❌ node-opusenc
 
@@ -43,6 +47,16 @@ This one is really fast and result is good, [it's a C library](https://sourcefor
 
 1. Install the binary `brew install sox`
 2. Resample the file `time sox /Users/dieudonn/Downloads/large-sample-usa.wav -r 16000 ./output/output-sox.wav`
+![sox-binary](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/b927ce04-3e24-4a85-8559-22d882be1919)
+
+## 🟧 Speex binary (2s)
+
+It's the binary speex itself , you will need to send it pcm file, so convert it first !
+1.  `brew install speex` 
+to try if `time speexenc --vbr --quality 5 --stereo --rate 16000 /Users/dieudonn/Downloads/large-sample-usa.pcm  output/output-speex.wav`
+
+![spee-binary](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/164b2a29-c27a-4b56-aa1f-f3a40b7e8d55)
+
 
 ## ✅ Rubato Rust library (0.2s-0.4s)
 
@@ -55,6 +69,7 @@ Two way of testing them:
 
 Or you can test it in the github rubato folder
 with this [kind of command](https://github.com/HEnquist/rubato/blob/master/examples/process_f64.rs#L24C5-L24C98) `argo run --release --example process_f64 SincFixedIn sine_f64_2ch.raw test.raw 44100 192000 2`
+![rubato](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/f63872f0-3f3b-43e2-a9c3-a1b61b89c80b)
 
 ## 🟧 Wavefile (~11s)
 
@@ -63,6 +78,9 @@ Based on the [full JS wavefile package](https://www.npmjs.com/package/wavefile#c
 1. `yarn` to install deps
 2. Setup the `.env` file correctly
 3. run `npx ts-node src/wavefile.ts`
+
+![Capture d’écran 2023-10-13 à 10 56 18](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/35a50e81-9248-4cd6-bda0-620a7a5e088b)
+
 
 ## ✅ fluent-ffmpeg (0.3s)
 
