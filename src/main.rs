@@ -1,5 +1,7 @@
 extern crate dotenv;
+extern crate rand;
 
+use rand::Rng;
 use rubato::{Resampler, SincFixedIn,  SincInterpolationType, SincInterpolationParameters, WindowFunction};
 use std::env;
 use std::fs::File;
@@ -19,75 +21,87 @@ fn main() {
     // Open the input
     let default_path = "/Users/dieudonn/Downloads/large-sample-usa.raw";
     let input_path = env::var("LARGE_WAV_PATH").unwrap_or(default_path.to_string());
-    let output_path = env::current_dir().unwrap().join("output/output-rubato-sync.raw") ;
 
     let file_in_disk = File::open(input_path).expect("Can't open file");
     let mut file_in_reader = BufReader::new(file_in_disk);
     let indata = read_file(&mut file_in_reader, channels);
     let nbr_input_frames = indata[0].len();
 
+
+    let _f_ratio = fs_out as f64 / fs_in as f64;
+
     // Create buffer for storing output
-    let mut outdata = vec![
-        Vec::with_capacity(
-            2 * (nbr_input_frames as f32 * fs_out as f32 / fs_in as f32) as usize
-        );
-        channels
-    ];
+    let num_buffers = 50;
 
-    let f_ratio = fs_out as f64 / fs_in as f64;
+    let duration_total = Instant::now();
+    for index in 0..num_buffers {
+        let indata_copy = indata.clone();
+        let _duration = Instant::now();
+        let output_filename = format!("output/output-rubato-{}.raw", index);
+        let _output_path = env::current_dir().unwrap().join(output_filename) ;
+        // Create buffer for storing output
+        let mut outdata = vec![
+            Vec::with_capacity(
+                2 * (nbr_input_frames as f32 * fs_out as f32 / fs_in as f32) as usize
+            );
+            channels
+        ];
 
-    let duration = Instant::now();
-    // Instanciate the re-sampler 
-    let params = SincInterpolationParameters {
-        sinc_len: 256,
-        f_cutoff: 0.95,
-        interpolation: SincInterpolationType::Linear,
-        oversampling_factor: 256,
-        window: WindowFunction::BlackmanHarris2,
-    };
-    let mut resampler = SincFixedIn::<f64>::new( // replace SincFixedIn by the async one which is fr faster
-        16000 as f64 / 44100 as f64,
-        2.0,
-        params,
-        1024,
-        2,
-    ).unwrap();
-    // Prepare
-    let mut input_frames_next = resampler.input_frames_next();
-    let resampler_delay = resampler.output_delay();
-    let mut outbuffer = vec![vec![0.0f64; resampler.output_frames_max()]; channels];
-    let mut indata_slices: Vec<&[f64]> = indata.iter().map(|v| &v[..]).collect();
 
-    // Process all full chunks
+        // Instanciate the re-sampler 
+        let params = SincInterpolationParameters {
+            sinc_len: 256,
+            f_cutoff: 0.95,
+            interpolation: SincInterpolationType::Linear,
+            oversampling_factor: 256,
+            window: WindowFunction::BlackmanHarris2,
+        };
+        let mut resampler = SincFixedIn::<f64>::new( // replace SincFixedIn by the async one which is fr faster
+            choose_random_sample_rate() / 44100_f64,
+            2.0,
+            params,
+            1024,
+            2,
+        ).unwrap();
+        // Prepare
+        let mut input_frames_next = resampler.input_frames_next();
+        let _resampler_delay = resampler.output_delay();
+        let mut outbuffer = vec![vec![0.0f64; resampler.output_frames_max()]; channels];
+        let mut indata_slices: Vec<&[f64]> = indata_copy.iter().map(|v| &v[..]).collect();
 
-    while indata_slices[0].len() >= input_frames_next {
-        let (nbr_in, nbr_out) = resampler
-            .process_into_buffer(&indata_slices, &mut outbuffer, None)
-            .unwrap();
-        for chan in indata_slices.iter_mut() {
-            *chan = &chan[nbr_in..];
+        // Process all full chunks
+
+        while indata_slices[0].len() >= input_frames_next {
+            let (nbr_in, nbr_out) = resampler
+                .process_into_buffer(&indata_slices, &mut outbuffer, None)
+                .unwrap();
+            for chan in indata_slices.iter_mut() {
+                *chan = &chan[nbr_in..];
+            }
+            append_frames(&mut outdata, &outbuffer, nbr_out);
+            input_frames_next = resampler.input_frames_next();
         }
-        append_frames(&mut outdata, &outbuffer, nbr_out);
-        input_frames_next = resampler.input_frames_next();
-    }
 
-    // Process a partial chunk with the last frames.
-    if !indata_slices[0].is_empty() {
-        let (_nbr_in, nbr_out) = resampler
-            .process_partial_into_buffer(Some(&indata_slices), &mut outbuffer, None)
-            .unwrap();
-        append_frames(&mut outdata, &outbuffer, nbr_out);
-    }
+        // Process a partial chunk with the last frames.
+        if !indata_slices[0].is_empty() {
+            let (_nbr_in, nbr_out) = resampler
+                .process_partial_into_buffer(Some(&indata_slices), &mut outbuffer, None)
+                .unwrap();
+            append_frames(&mut outdata, &outbuffer, nbr_out);
+        }
 
-    let nbr_output_frames = (nbr_input_frames as f32 * fs_out as f32 / fs_in as f32) as usize;
-    println!("Re-Sample was done in {:?}.. write file to disk now", duration.elapsed());
-    let mut file_out_disk = File::create(output_path).unwrap();
-    write_frames(
-        outdata,
-        &mut file_out_disk,
-        resampler_delay,
-        nbr_output_frames,
-    );
+        let _nbr_output_frames = (nbr_input_frames as f32 * fs_out as f32 / fs_in as f32) as usize;
+        // println!("Re-Sample was done in {:?}.. write file to disk now", duration.elapsed());
+        // let _file_out_disk = File::create(output_path).unwrap();
+        // write_frames(
+        //     outdata,
+        //     &mut file_out_disk,
+        //     resampler_delay,
+        //     nbr_output_frames,
+        // );
+    }
+    println!("Re-Sample of 50 file was done in {:?}.. write file to disk now", duration_total.elapsed());
+
 }
 
 
@@ -120,7 +134,7 @@ fn write_frames<W: Write + Seek>(
     frames_to_write: usize,
 ) {
     let channels = waves.len();
-    println!("We have {}  elements in the vec to export now", frames_to_write);
+    // println!("We have {}  elements in the vec to export now", frames_to_write);
     let end = frames_to_skip + frames_to_write;
     for frame in frames_to_skip..end {
         for wave in waves.iter().take(channels) {
@@ -136,4 +150,11 @@ fn append_frames(buffers: &mut [Vec<f64>], additional: &[Vec<f64>], nbr_frames: 
         .iter_mut()
         .zip(additional.iter())
         .for_each(|(b, a)| b.extend_from_slice(&a[..nbr_frames]));
+}
+
+
+fn choose_random_sample_rate() -> f64 {
+    let sample_rates: Vec<f64> = vec![16000_f64, 32000_f64, 44100_f64, 48000_f64];
+    let random_index = rand::thread_rng().gen_range(0..sample_rates.len());
+    sample_rates[random_index]
 }
