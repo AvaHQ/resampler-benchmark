@@ -11,7 +11,7 @@ This repository is just to have a possibility to remember the benchmark for resa
 2. Download the audio file **(~60mb)** and rename it `large-sample-usa.wav`
 3. Duplicate the `.env.example` file to `.env` and put the right path of the downloaded file
 
-### 🟧 Speex-resampler (4s-13s)
+### 🟧 Speex-resampler (4s)
 
 It's the library we are using ATM at ava, it's a webassembly using c native code.
 It have issue on master branch but is faster on the branch used on ava-backend called `remove-unhandled-rejection-handler` we need to fix that to not re-create the issue. master has one more commit `f9f3320cc8fc61a585489efa5552a5f8ec0c3517` and it pass from 20 seconds on master to 4 secondes of transform inside the branch
@@ -55,3 +55,19 @@ Two way of testing them:
 
 Or you can test it in the github rubato folder
 with this [kind of command](https://github.com/HEnquist/rubato/blob/master/examples/process_f64.rs#L24C5-L24C98) `argo run --release --example process_f64 SincFixedIn sine_f64_2ch.raw test.raw 44100 192000 2`
+
+## 🟧 Wavefile (~11s)
+
+Based on the [full JS wavefile package](https://www.npmjs.com/package/wavefile#change-the-sample-rate) , easy to use but very slow to convert the file
+
+1. `yarn` to install deps
+2. Setup the `.env` file correctly
+3. run `npx ts-node src/wavefile.ts`
+
+## ✅ fluent-ffmpeg (0.3s)
+
+Based on the [ffmpeg-package for node](https://www.npmjs.com/package/fluent-ffmpeg) , easy to use with buffer and stream and fast! It need ffmpeg to be installed
+
+1. `yarn` to install deps
+2. Setup the `.env` file correctly
+3. run `npx ts-node src/fluent-ffmpeg.ts`

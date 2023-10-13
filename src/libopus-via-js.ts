@@ -4,8 +4,6 @@ import { spawn } from "child_process";
 import { resolve } from "path";
 import "dotenv/config";
 
-console.log(process.env.LARGE_WAV_PATH);
-
 const comments = new opus.opusenc.Comments();
 const enc = new opus.opusenc.Encoder();
 enc.createFile(

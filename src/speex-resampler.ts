@@ -3,8 +3,8 @@ import { resolve } from "path";
 // ! We have a major GAP of transform between our master branch of our speex-resampler fork (20s->4s)
 // ? uncomment the version you want to test
 // import SpeexResampler from "speex-resampler"; // original version from the creator
-// import SpeexResampler from "speex-resampler-ava-version-branch"; //branch version (better)
-import SpeexResampler from "speex-resampler-ava-version-master"; //master version (worst)
+import SpeexResampler from "speex-resampler-ava-version-branch"; //branch version (better)
+// import SpeexResampler from "speex-resampler-ava-version-master"; //master version (worst)
 
 (async () => {
   await SpeexResampler.initPromise; // will be resolved once the WASM module has been compiled, before this you cannot call the SpeexResampler processChunk method

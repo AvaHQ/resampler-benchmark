@@ -8,6 +8,7 @@
   "dependencies": {
     "@alexanderolsen/libsamplerate-js": "^2.0.4",
     "dotenv": "^16.3.1",
+    "fluent-ffmpeg": "^2.1.2",
     "libopus": "^0.0.36",
     "speex-resampler": "^3.0.1",
     "speex-resampler-ava-version-branch": "AvaHQ/speex-resampler#remove-unhandled-rejection-handler",
@@ -17,6 +18,7 @@
     "wavefile": "^11.0.0"
   },
   "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.22",
     "@types/node": "^20.8.4"
   }
 }
