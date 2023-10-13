@@ -8,7 +8,7 @@ This repository is just to have a possibility to remember the benchmark for resa
 
 0. Clone the repo
 1. `yarn`
-2. Download the audio file **(~60mb)** and rename it `large-sample-usa.wav`
+2. Download the [audio file](https://commons.wikimedia.org/wiki/File:%22Going_Home%22,_performed_by_the_United_States_Air_Force_Band.wav) **(~60mb)** and rename it `large-sample-usa.wav`
 3. Duplicate the `.env.example` file to `.env` and put the right path of the downloaded file
 
 ### 🟧 Speex-resampler (4s)
