@@ -93,7 +93,7 @@ async fn main() {
         let file_out = output_path.to_str().unwrap().to_string();
         let fs_out_str = choose_random_sample_rate();
         let fs_out = fs_out_str.parse::<usize>().unwrap();
-        // println!("Sample {} for output {}", &fs_out,&file_out);
+        println!("Sample {} for output {}", &fs_out,&file_out);
 
         // Create buffer for storing output
         let mut outdata = vec![
