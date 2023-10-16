@@ -58,7 +58,7 @@ to try if `time speexenc --vbr --quality 5 --stereo --rate 16000 /Users/dieudonn
 ![spee-binary](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/164b2a29-c27a-4b56-aa1f-f3a40b7e8d55)
 
 
-## ✅ Rubato Rust library (0.2s-0.4s)
+## ✅ Rubato Rust library (0.2s-0.4s , 18 files in async)
 
 [This library](https://github.com/HEnquist/rubato) can be used in a Rust program directly, there is [4/5](https://github.com/HEnquist/rubato/tree/master/examples) different options to tests that have better result of better speed.
 Two way of testing them:
@@ -71,6 +71,9 @@ Or you can test it in the github rubato folder
 with this [kind of command](https://github.com/HEnquist/rubato/blob/master/examples/process_f64.rs#L24C5-L24C98) `argo run --release --example process_f64 SincFixedIn sine_f64_2ch.raw test.raw 44100 192000 2`
 ![rubato](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/f63872f0-3f3b-43e2-a9c3-a1b61b89c80b)
 
+<img width="835" alt=" z" src="https://github.com/AvaHQ/resampler-benchmark/assets/7901366/fbdb923c-9ecb-4f63-ba8f-42719770e48f">
+
+
 ## 🟧 Wavefile (~11s)
 
 Based on the [full JS wavefile package](https://www.npmjs.com/package/wavefile#change-the-sample-rate) , easy to use but very slow to convert the file
@@ -82,9 +85,10 @@ Based on the [full JS wavefile package](https://www.npmjs.com/package/wavefile#c
 ![Capture d’écran 2023-10-13 à 10 56 18](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/35a50e81-9248-4cd6-bda0-620a7a5e088b)
 
 
-## ✅ fluent-ffmpeg (0.3s)
+## ✅ fluent-ffmpeg (0.3s per one file, 10s for 70 files in async)
 
 Based on the [ffmpeg-package for node](https://www.npmjs.com/package/fluent-ffmpeg) , easy to use with buffer and stream and fast! It need ffmpeg to be installed
+<img width="803" alt="Capture d’écran 2023-10-16 à 16 20 14" src="https://github.com/AvaHQ/resampler-benchmark/assets/7901366/cd9f291e-f4ab-412a-8cf2-91995430f13d">
 
 1. `yarn` to install deps
 2. Setup the `.env` file correctly
