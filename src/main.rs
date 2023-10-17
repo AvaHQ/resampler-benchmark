@@ -1,9 +1,10 @@
 extern crate rubato;
 use rubato::{
-    implement_resampler, FastFixedOut, PolynomialDegree,
+    implement_resampler, FastFixedIn, PolynomialDegree
 };
 use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::task::JoinSet;
+
 use std::convert::TryInto;
 
 use std::{env, vec};
@@ -68,7 +69,7 @@ fn append_frames(buffers: &mut [Vec<f64>], additional: &[Vec<f64>], nbr_frames: 
 async fn main() {
 
     let mut write_files_futures = JoinSet::new();
-    let num_buffers = 50;
+    let num_buffers = 70;
 
 
     let file_in = "/Users/dieudonn/Downloads/large-sample-usa.raw";
@@ -79,7 +80,7 @@ async fn main() {
     let channels_str = "2";
     let channels = channels_str.parse::<usize>().unwrap();
 
-    println!("Copy input file to buffer");
+    // println!("Copy input file to buffer");
     let file_in_disk = File::open(file_in).expect("Can't open file");
     let mut file_in_reader = BufReader::new(file_in_disk);
     let indata = read_file(&mut file_in_reader, channels);
@@ -103,11 +104,12 @@ async fn main() {
             channels
         ];
 
-        let f_ratio = fs_out as f64 / fs_in as f64;
+        let _f_ratio = fs_out as f64 / fs_in as f64;
         
 
         // Create resampler
-        let mut resampler=  FastFixedOut::<f64>::new(f_ratio, 1.1, PolynomialDegree::Septic, 1024, channels).unwrap();
+        // let _resampler2=  FftFixedIn::<f64>::new(fs_in, fs_out,1024, 2, channels).unwrap();
+        let mut resampler=  FastFixedIn::<f64>::new(_f_ratio, 1.1, PolynomialDegree::Septic, 1024, channels).unwrap();
 
         // Prepare
         let mut input_frames_next = resampler.input_frames_next();
@@ -159,7 +161,7 @@ async fn main() {
 
     }
     let duration_total_time = duration_total.elapsed();
-    println!("Resampling 50 files took: {:?}", duration_total_time);
+    println!("Resampling {} files took: {:?}", num_buffers, duration_total_time);
 }
 
 
