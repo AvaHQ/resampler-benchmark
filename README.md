@@ -58,7 +58,7 @@ to try if `time speexenc --vbr --quality 5 --stereo --rate 16000 /Users/dieudonn
 ![spee-binary](https://github.com/AvaHQ/resampler-benchmark/assets/7901366/164b2a29-c27a-4b56-aa1f-f3a40b7e8d55)
 
 
-## ✅ Rubato Rust library (0.2s-0.4s , 18 files in async)
+## ✅ Rubato Rust library (0.2s-0.4s , 18s for 70 files in async)
 
 [This library](https://github.com/HEnquist/rubato) can be used in a Rust program directly, there is [4/5](https://github.com/HEnquist/rubato/tree/master/examples) different options to tests that have better result of better speed.
 Two way of testing them:
